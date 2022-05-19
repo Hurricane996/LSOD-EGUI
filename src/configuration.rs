@@ -52,18 +52,15 @@ impl Configuration {
     fn get() -> Option<Self> {
         let file = File::open(Configuration::get_path()?).ok()?;
 
-        match serde_json::de::from_reader(BufReader::new(file)) {
-            Ok(s) => Some(s),
-            Err(e) => {
-                println!("failed to load {e}");
-                None
-            }
-        }
-        .and_then(|mut config: Configuration| {
-            config.validate();
-            Some(config)
-        })
+        serde_json::de::from_reader(BufReader::new(file))
+            .map_err(|e| println!("Failed to load config, got error: {e}"))
+            .ok()
+            .map(|mut config: Configuration| {
+                config.validate();
+                config
+            })
     }
+
     pub fn get_path() -> Option<PathBuf> {
         let mut location = dirs::config_dir()?;
         location.push("lsod_config.json");
@@ -77,7 +74,7 @@ impl Configuration {
             .create(true)
             .open(Configuration::get_path().ok_or(NoConfigDirError)?)?;
 
-        serde_json::ser::to_writer(BufWriter::new(file), self).map_err(|e| e.into())
+        serde_json::ser::to_writer(BufWriter::new(file), self).map_err(Into::into)
     }
 
     pub fn get_or_default() -> Self {
@@ -116,7 +113,7 @@ impl Configuration {
         }
 
         if self.size.1 == 0 {
-            self.size.1 = 1
+            self.size.1 = 1;
         }
     }
 }

@@ -53,7 +53,7 @@ fn update_hotkeys(shared_state: &mut SharedState, state: &mut SettingsState) {
     for (hotkey, keycode) in state.hotkey_state {
         if keycode != hotkey.get_keycode(&hotkey_config) {
             hotkey.set_keycode(&mut hotkey_config, keycode);
-            dirty = true
+            dirty = true;
         }
     }
 
@@ -118,7 +118,7 @@ fn height_get_set(x: Option<f64>, shared_state: &mut SharedState) -> f64 {
             shared_state.config.size.1 = height.round() as u32;
 
             if shared_state.config.size.1 == 0 {
-                shared_state.config.size.1 = 1
+                shared_state.config.size.1 = 1;
             }
 
             shared_state.send_event.send_event(UserEvent::Resize).ok();
@@ -134,7 +134,7 @@ fn width_get_set(x: Option<f64>, shared_state: &mut SharedState) -> f64 {
             shared_state.config.size.0 = width.round() as u32;
 
             if shared_state.config.size.0 == 0 {
-                shared_state.config.size.0 = 1
+                shared_state.config.size.0 = 1;
             }
 
             shared_state.send_event.send_event(UserEvent::Resize).ok();

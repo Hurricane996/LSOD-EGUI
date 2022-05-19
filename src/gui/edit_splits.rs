@@ -46,15 +46,10 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
                 if text.changed() {
                     if state.offset_string.is_empty() {
-                        state.run.set_offset(TimeSpan::zero())
-                    } else {
-                        match state.attempts_string.parse::<f64>() {
-                            Ok(new_offset) => {
-                                state.run.set_offset(TimeSpan::from_seconds(new_offset));
-                                state.dirty = true
-                            }
-                            Err(_) => {}
-                        }
+                        state.run.set_offset(TimeSpan::zero());
+                    } else if let Ok(new_offset) =  state.attempts_string.parse::<f64>() {
+                        state.run.set_offset(TimeSpan::from_seconds(new_offset));
+                        state.dirty = true;
                     }
                 }
 
@@ -86,7 +81,7 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
                 }
 
                 if text.lost_focus() && state.attempts_string.is_empty() {
-                    state.attempts_string.push_str("0")
+                    state.attempts_string.push('0');
                 }
             })
         });
@@ -152,7 +147,7 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
         }
 
         if ui.button("Discard Changes").clicked() {
-            *state = SplitsState::new(shared_state.timer.read().run().clone())
+            *state = SplitsState::new(shared_state.timer.read().run().clone());
         }
     });
 }

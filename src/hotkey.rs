@@ -15,7 +15,7 @@ pub enum Hotkey {
 }
 
 impl Hotkey {
-    pub fn get_name(&self) -> &'static str {
+    pub fn get_name(self) -> &'static str {
         match self {
             Hotkey::Split => "Split",
             Hotkey::Reset => "Reset",
@@ -29,7 +29,7 @@ impl Hotkey {
         }
     }
 
-    pub fn get_keycode(&self, config: &HotkeyConfig) -> Option<KeyCode> {
+    pub fn get_keycode(self, config: &HotkeyConfig) -> Option<KeyCode> {
         match self {
             Hotkey::Split => config.split,
             Hotkey::Reset => config.reset,
@@ -43,7 +43,7 @@ impl Hotkey {
         }
     }
 
-    pub fn set_keycode(&self, config: &mut HotkeyConfig, keycode: Option<KeyCode>) {
+    pub fn set_keycode(self, config: &mut HotkeyConfig, keycode: Option<KeyCode>) {
         match self {
             Hotkey::Split => config.split = keycode,
             Hotkey::Reset => config.reset = keycode,
@@ -59,7 +59,7 @@ impl Hotkey {
 }
 
 use KeyCode::*;
-// this needs to be updated if livesplit has more keycodes, todo how
+// this needs to be updated if livesplit has more keycodes, todo how to make this iteration automatic
 pub const KEY_CODES: [KeyCode; 214] = [
     Backquote,
     Backslash,

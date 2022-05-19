@@ -27,9 +27,9 @@ use self::{edit_layout::LayoutState, edit_splits::SplitsState, settings::Setting
 
 enum Menu {
     Main,
-    Settings(SettingsState),
-    EditSplits(SplitsState),
-    EditLayout(LayoutState),
+    Settings(Box<SettingsState>),
+    EditSplits(Box<SplitsState>),
+    EditLayout(Box<LayoutState>),
 }
 const ARIAL: &[u8] = include_bytes!("../arial.ttf");
 pub struct ConfigurationWindow {
@@ -65,7 +65,7 @@ impl ApplicationWindow for ConfigurationWindow {
 
     fn redraw(&mut self, shared_state: &mut SharedState) {
         let needs_repaint = self.egui_glow.run(self.gl_window.window(), |ctx| {
-            ConfigurationWindow::egui(ctx, &mut self.current_menu, shared_state)
+            ConfigurationWindow::egui(ctx, &mut self.current_menu, shared_state);
         });
 
         if needs_repaint {
@@ -95,7 +95,7 @@ impl ApplicationWindow for ConfigurationWindow {
     }
 
     fn request_redraw(&mut self) {
-        self.gl_window.window().request_redraw()
+        self.gl_window.window().request_redraw();
     }
 
     fn on_destroy(&mut self, shared_state: &mut SharedState) {

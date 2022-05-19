@@ -66,11 +66,7 @@ fn main() {
         match event {
             Event::WindowEvent {
                 window_id,
-                event: WindowEvent::CloseRequested,
-            }
-            | Event::WindowEvent {
-                window_id,
-                event: WindowEvent::Destroyed,
+                event: WindowEvent::CloseRequested | WindowEvent::Destroyed,
             }
             | Event::UserEvent(UserEvent::DestroyWindow(window_id)) => {
                 if window_id == main_window_id {
@@ -94,7 +90,7 @@ fn main() {
                     return;
                 };
 
-                window.window_event(event, &mut shared_state)
+                window.window_event(event, &mut shared_state);
             }
 
             Event::RedrawRequested(window_id) => {

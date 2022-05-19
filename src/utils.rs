@@ -16,7 +16,7 @@ pub fn load_layout_from_file(path: &PathBuf) -> Result<Layout> {
         return Ok(Layout::from_settings(settings));
     }
     file.seek(SeekFrom::Start(0))?;
-    layout::parser::parse(file).map_err(|e| e.into())
+    layout::parser::parse(file).map_err(Into::into)
 }
 
 pub fn load_splits_from_file(path: &PathBuf) -> Result<Run> {

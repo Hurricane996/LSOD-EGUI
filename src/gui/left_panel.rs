@@ -64,14 +64,14 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
                             
                             if let Some(path) = state.run().path() {
                                 if let Ok(file) = File::create(path) {
-                                    save_run(&state.run(), BufWriter::new(file)).ok();
+                                    save_run(state.run(), BufWriter::new(file)).ok();
                                 }
                             }
                             
                         }
 
                     }
-                    *menu = Menu::EditSplits(SplitsState::new(splits.clone()))
+                    *menu = Menu::EditSplits(SplitsState::new(splits.clone()).into());
                 }
 
                 let mut timer = shared_state.timer.write();
@@ -106,14 +106,14 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
     }
 
     if ui.button("Edit Splits").clicked() {
-        *menu = Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()))
+        *menu = Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()).into());
     }
 
     if ui.button("Edit Layout").clicked() {
-        *menu = Menu::EditLayout(Default::default())
+        *menu = Menu::EditLayout(Default::default());
     }
 
     if ui.button("Settings").clicked() {
-        *menu = Menu::Settings(SettingsState::new(shared_state.hotkey_system.config()))
+        *menu = Menu::Settings(SettingsState::new(shared_state.hotkey_system.config()).into());
     }
 }
