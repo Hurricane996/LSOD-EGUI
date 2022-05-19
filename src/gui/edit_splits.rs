@@ -23,6 +23,7 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
                 if ui.text_edit_singleline(&mut state.game_name).changed() {
                     state.run.set_game_name(&state.game_name);
+                    state.dirty = true;
                 }
             });
 
@@ -31,6 +32,8 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
                 if ui.text_edit_singleline(&mut state.category_name).changed() {
                     state.run.set_category_name(&state.category_name);
+                    state.dirty = true;
+
                 }
             });
 
@@ -47,7 +50,8 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
                     } else {
                         match state.attempts_string.parse::<f64>() {
                             Ok(new_offset) => {
-                                state.run.set_offset(TimeSpan::from_seconds(new_offset))
+                                state.run.set_offset(TimeSpan::from_seconds(new_offset));
+                                state.dirty = true
                             }
                             Err(_) => {}
                         }
@@ -56,6 +60,7 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
                 if text.lost_focus() {
                     state.offset_string = state.run.offset().to_duration().to_string();
+
                 }
             });
 
@@ -70,8 +75,12 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
                         match state.attempts_string.parse::<u32>() {
                             Err(_) => {
                                 state.attempts_string = state.run.attempt_count().to_string();
+                                
                             }
-                            Ok(new_count) => state.run.set_attempt_count(new_count),
+                            Ok(new_count) => {
+                                state.run.set_attempt_count(new_count);
+                                state.dirty = true;
+                            },
                         }
                     }
                 }
@@ -103,6 +112,8 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
                     if ui.text_edit_singleline(&mut text).changed() {
                         segment.set_name(text);
+                        state.dirty = true;
+
                     }
 
                     for (name, comparison) in segment.comparisons_mut().iter_mut() {
@@ -118,6 +129,8 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
                         if ui.text_edit_singleline(&mut label).changed() {
                             // todo actually update it
+                            state.dirty = true;
+
                         }
                     }
 
@@ -127,7 +140,7 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
         });
 
     ui.horizontal(|ui| {
-        if ui.button("Save").clicked() {
+        if ui.button("Save").clicked() && state.dirty {
             if let Some(path) = state.run.path() {
                 if let Ok(file) = File::create(path) {
                     save_run(&state.run, BufWriter::new(file)).ok();
@@ -152,6 +165,7 @@ pub(super) struct SplitsState {
     category_name: String,
     attempts_string: String,
     offset_string: String,
+    dirty: bool
 }
 
 impl SplitsState {
@@ -164,6 +178,15 @@ impl SplitsState {
             run,
             time_formatter: Default::default(),
             fraction_formatter: Default::default(),
+            dirty: false
         }
+    }
+
+    pub fn dirty(&self) -> bool {
+        self.dirty
+    }
+
+    pub(crate) fn run(&self) -> &Run {
+        &self.run
     }
 }

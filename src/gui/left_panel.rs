@@ -19,13 +19,22 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
             .pick_file();
 
         if let Some(path) = path {
-            if let Ok(layout) = load_layout_from_file(&path) {
-                println!("Layout loading successful");
-                shared_state.layout = layout;
-                shared_state.config.layout_path = Some(path);
+            match load_layout_from_file(&path) {
+                Ok(layout) =>{
+                    println!("Layout loading successful");
+                    shared_state.layout = layout;
+                    shared_state.config.layout_path = Some(path);
+                },
+                Err(e) => {
+                    MessageDialog::new()
+                        .set_title("Failed to load layout")
+                        .set_description(format!("Failed to load layout, got error {e}").as_str());
+                }
             }
         }
-        // todo error handling
+        else {
+
+        }
     }
 
     if ui.button("Load Splits").clicked() {
@@ -40,6 +49,31 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
 
                 println!("Split loading successful");
 
+                // when we have new splits, discard the old ones
+                if let Menu::EditSplits(state) = menu {
+                    if state.dirty() {
+                        let should_save_splits = MessageDialog::new()
+                            .set_buttons(MessageButtons::YesNo)
+                            .set_title("Save Splits?")
+                            .set_description(
+                                "Your splits have been edited, would you like to save them now?",
+                            )
+                            .show();
+                        
+                        if should_save_splits {
+                            
+                            if let Some(path) = state.run().path() {
+                                if let Ok(file) = File::create(path) {
+                                    save_run(&state.run(), BufWriter::new(file)).ok();
+                                }
+                            }
+                            
+                        }
+
+                    }
+                    *menu = Menu::EditSplits(SplitsState::new(splits.clone()))
+                }
+
                 let mut timer = shared_state.timer.write();
 
                 let should_save_splits = if timer.run().has_been_modified() {
@@ -50,6 +84,8 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
                             "Your splits have been edited, would you like to save them now?",
                         )
                         .show()
+
+
                 } else {
                     false
                 };

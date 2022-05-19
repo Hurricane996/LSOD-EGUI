@@ -148,7 +148,6 @@ impl ConfigurationWindow {
                 Menu::EditLayout(_) => edit_layout(ui),
                 Menu::EditSplits(state) => edit_splits(ui, shared_state, state),
             }
-            // todo error handling
         });
     }
 
