@@ -78,7 +78,7 @@ impl ApplicationWindow for MainWindow {
                 self.pixels.get_frame(),
                 [self.window_size.width, self.window_size.height],
                 self.window_size.width,
-                false
+                false,
             );
 
             self.pixels
