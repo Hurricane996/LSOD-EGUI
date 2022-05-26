@@ -1,7 +1,7 @@
 use std::{fs::File, io::BufWriter};
 
 use egui_glow::egui_winit::egui::Ui;
-use livesplit_core::run::saver::livesplit::save_run;
+use livesplit_core::{run::saver::livesplit::save_run, TimerPhase};
 use rfd::{FileDialog, MessageButtons, MessageDialog};
 
 use crate::{
@@ -20,20 +20,18 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
 
         if let Some(path) = path {
             match load_layout_from_file(&path) {
-                Ok(layout) =>{
+                Ok(layout) => {
                     println!("Layout loading successful");
                     shared_state.layout = layout;
                     shared_state.config.layout_path = Some(path);
-                },
+                }
                 Err(e) => {
                     MessageDialog::new()
                         .set_title("Failed to load layout")
                         .set_description(format!("Failed to load layout, got error {e}").as_str());
                 }
             }
-        }
-        else {
-
+        } else {
         }
     }
 
@@ -59,17 +57,14 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
                                 "Your splits have been edited, would you like to save them now?",
                             )
                             .show();
-                        
+
                         if should_save_splits {
-                            
                             if let Some(path) = state.run().path() {
                                 if let Ok(file) = File::create(path) {
                                     save_run(state.run(), BufWriter::new(file)).ok();
                                 }
                             }
-                            
                         }
-
                     }
                     *menu = Menu::EditSplits(SplitsState::new(splits.clone()).into());
                 }
@@ -84,8 +79,6 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
                             "Your splits have been edited, would you like to save them now?",
                         )
                         .show()
-
-
                 } else {
                     false
                 };
@@ -106,7 +99,15 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
     }
 
     if ui.button("Edit Splits").clicked() {
-        *menu = Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()).into());
+        if shared_state.timer.read().current_phase() != TimerPhase::NotRunning {
+            MessageDialog::new()
+                .set_title("Can't edit splits")
+                .set_description("You can't edit splits while the timer is running!+")
+                .show();
+        } else {
+            *menu =
+                Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()).into());
+        }
     }
 
     if ui.button("Edit Layout").clicked() {

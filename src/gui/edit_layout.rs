@@ -5,5 +5,3 @@ pub fn edit_layout(ui: &mut Ui) {
 }
 #[derive(Default)]
 pub(super) struct LayoutState {}
-
-

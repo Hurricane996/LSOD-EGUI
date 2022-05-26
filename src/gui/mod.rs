@@ -98,8 +98,9 @@ impl ApplicationWindow for ConfigurationWindow {
         self.gl_window.window().request_redraw();
     }
 
-    fn on_destroy(&mut self, shared_state: &mut SharedState) {
+    fn on_destroy(&mut self, shared_state: &mut SharedState) -> bool {
         shared_state.has_configuration_window = false;
+        true
     }
 }
 
@@ -131,7 +132,7 @@ impl ConfigurationWindow {
             egui_glow,
             gl,
             current_menu: Menu::Main,
-            clear_color: [0.1, 0.1, 0.1],
+            clear_color: [0., 1., 0.1],
         }
     }
 
@@ -141,13 +142,11 @@ impl ConfigurationWindow {
 
     fn egui(ctx: &egui::Context, menu: &mut Menu, shared_state: &mut SharedState) {
         egui::SidePanel::left("Left Panel").show(ctx, |ui| left_panel(ui, menu, shared_state));
-        egui::CentralPanel::default().show(ctx, |ui| {
-            match menu {
-                Menu::Main => {}
-                Menu::Settings(state) => hotkey_component(ui, shared_state, state),
-                Menu::EditLayout(_) => edit_layout(ui),
-                Menu::EditSplits(state) => edit_splits(ui, shared_state, state),
-            }
+        egui::CentralPanel::default().show(ctx, |ui| match menu {
+            Menu::Main => {}
+            Menu::Settings(state) => hotkey_component(ui, shared_state, state),
+            Menu::EditLayout(_) => edit_layout(ui),
+            Menu::EditSplits(state) => edit_splits(ui, shared_state, state),
         });
     }
 

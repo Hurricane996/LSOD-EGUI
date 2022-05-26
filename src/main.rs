@@ -70,15 +70,15 @@ fn main() {
             }
             | Event::UserEvent(UserEvent::DestroyWindow(window_id)) => {
                 if window_id == main_window_id {
-                    main_window.on_destroy(&mut shared_state);
-                    other_windows.clear();
-                    *control_flow = ControlFlow::Exit;
-                    return;
+                    if main_window.on_destroy(&mut shared_state) {
+                        other_windows.clear();
+                        *control_flow = ControlFlow::Exit;
+                    }
                 } else if let Some(window) = other_windows.get_mut(&window_id) {
-                    window.on_destroy(&mut shared_state);
+                    if window.on_destroy(&mut shared_state) {
+                        other_windows.remove(&window_id);
+                    }
                 }
-
-                other_windows.remove(&window_id);
             }
 
             Event::WindowEvent { window_id, event } => {

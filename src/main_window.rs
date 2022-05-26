@@ -8,6 +8,7 @@ use glutin::{
 };
 use livesplit_core::{
     layout::LayoutState, rendering::software::BorrowedRenderer, run::saver::livesplit::save_run,
+    TimerPhase,
 };
 use pixels::{Pixels, SurfaceTexture};
 use rfd::{MessageButtons, MessageDialog};
@@ -95,10 +96,22 @@ impl ApplicationWindow for MainWindow {
         self.window.request_redraw();
     }
 
-    fn on_destroy(&mut self, shared_state: &mut SharedState) {
+    fn on_destroy(&mut self, shared_state: &mut SharedState) -> bool {
         shared_state.config.save().ok();
 
-        let timer = shared_state.timer.read();
+        let mut timer = shared_state.timer.write();
+
+        if let TimerPhase::Running | TimerPhase::Paused = timer.current_phase() {
+            let quit = MessageDialog::new()
+                .set_buttons(MessageButtons::YesNo)
+                .set_title("Really quit?")
+                .set_description("The timer is still running. Would you really like to quit?")
+                .show();
+
+            if !quit {
+                return false;
+            }
+        }
 
         let should_save_splits = if timer.run().has_been_modified() {
             MessageDialog::new()
@@ -111,6 +124,11 @@ impl ApplicationWindow for MainWindow {
         };
 
         if should_save_splits {
+            // for some reason when the timer is in the "ended" state, the new pb doesn't save
+            if let TimerPhase::Ended = timer.current_phase() {
+                timer.reset(true)
+            }
+
             let splits = timer.run();
             if let Some(path) = splits.path() {
                 if let Ok(file) = File::create(path) {
@@ -118,6 +136,8 @@ impl ApplicationWindow for MainWindow {
                 }
             }
         }
+
+        true
     }
 }
 impl MainWindow {
