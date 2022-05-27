@@ -22,6 +22,11 @@ impl SettingsState {
 
         Self { hotkey_state }
     }
+
+    pub fn on_destroy(&self, _shared_state: &SharedState) -> bool {
+        // nop
+        true
+    }
 }
 
 fn display_hotkey<'a>(keycode: Option<KeyCode>) -> &'a str {

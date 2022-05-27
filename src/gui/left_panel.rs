@@ -98,7 +98,7 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
         }
     }
 
-    if ui.button("Edit Splits").clicked() {
+    if ui.button("Edit Splits").clicked() && menu.on_destroy(shared_state) {
         if shared_state.timer.read().current_phase() != TimerPhase::NotRunning {
             MessageDialog::new()
                 .set_title("Can't edit splits")
@@ -110,11 +110,11 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
         }
     }
 
-    if ui.button("Edit Layout").clicked() {
+    if ui.button("Edit Layout").clicked() && menu.on_destroy(shared_state) {
         *menu = Menu::EditLayout(Default::default());
     }
 
-    if ui.button("Settings").clicked() {
+    if ui.button("Settings").clicked() && menu.on_destroy(shared_state) {
         *menu = Menu::Settings(SettingsState::new(shared_state.hotkey_system.config()).into());
     }
 }

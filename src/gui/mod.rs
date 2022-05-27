@@ -31,6 +31,17 @@ enum Menu {
     EditSplits(Box<SplitsState>),
     EditLayout(Box<LayoutState>),
 }
+
+impl Menu {
+    fn on_destroy(&mut self, shared_state: &mut SharedState) -> bool {
+        match self {
+            Menu::Main => false,
+            Menu::Settings(state) => state.on_destroy(shared_state),
+            Menu::EditSplits(state) => state.on_destroy(shared_state),
+            Menu::EditLayout(state) => state.on_destroy(shared_state),
+        }
+    }
+}
 const ARIAL: &[u8] = include_bytes!("../arial.ttf");
 pub struct ConfigurationWindow {
     pub gl_window: ContextWrapper<PossiblyCurrent, Window>,
@@ -99,8 +110,13 @@ impl ApplicationWindow for ConfigurationWindow {
     }
 
     fn on_destroy(&mut self, shared_state: &mut SharedState) -> bool {
-        shared_state.has_configuration_window = false;
-        true
+        let ret = self.current_menu.on_destroy(shared_state);
+
+        if ret {
+            shared_state.has_configuration_window = false;
+        }
+
+        ret
     }
 }
 
