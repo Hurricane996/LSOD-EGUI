@@ -99,14 +99,15 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
     }
 
     if ui.button("Edit Splits").clicked() && menu.on_destroy(shared_state) {
-        if shared_state.timer.read().current_phase() != TimerPhase::NotRunning {
+        if shared_state.timer.read().current_phase() == TimerPhase::NotRunning {
+            *menu =
+                Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()).into());
+
+        } else {
             MessageDialog::new()
                 .set_title("Can't edit splits")
                 .set_description("You can't edit splits while the timer is running!+")
                 .show();
-        } else {
-            *menu =
-                Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()).into());
         }
     }
 

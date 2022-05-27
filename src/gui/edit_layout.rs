@@ -13,7 +13,7 @@ pub(super) struct LayoutState {
 impl LayoutState {
     pub fn on_destroy(&mut self, _shared_state: &mut SharedState) -> bool {
         if self.dirty {
-            println!("asking about layout")
+            // nop
         }
 
         true

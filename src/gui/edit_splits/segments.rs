@@ -29,7 +29,7 @@ pub(super) fn segments(ui: &mut Ui, state: &mut SplitsState) {
                             Vec2::new(state.grid_width, 24.0),
                         );
 
-                        ui.painter().rect_filled(rect, 0.0, Color32::DARK_BLUE)
+                        ui.painter().rect_filled(rect, 0.0, Color32::DARK_BLUE);
                     }
 
                     // empyty label for padding

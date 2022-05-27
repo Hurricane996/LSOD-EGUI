@@ -126,7 +126,7 @@ impl ApplicationWindow for MainWindow {
         if should_save_splits {
             // for some reason when the timer is in the "ended" state, the new pb doesn't save
             if let TimerPhase::Ended = timer.current_phase() {
-                timer.reset(true)
+                timer.reset(true);
             }
 
             let splits = timer.run();
