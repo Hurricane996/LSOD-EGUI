@@ -102,7 +102,6 @@ pub(super) fn left_panel(ui: &mut Ui, menu: &mut Menu, shared_state: &mut Shared
         if shared_state.timer.read().current_phase() == TimerPhase::NotRunning {
             *menu =
                 Menu::EditSplits(SplitsState::new(shared_state.timer.read().run().clone()).into());
-
         } else {
             MessageDialog::new()
                 .set_title("Can't edit splits")

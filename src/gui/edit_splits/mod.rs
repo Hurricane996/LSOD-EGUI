@@ -174,7 +174,11 @@ impl SplitsState {
                     }
                 }
 
-                shared_state.timer.write().replace_run(self.editor.run().clone(), false).ok();
+                shared_state
+                    .timer
+                    .write()
+                    .replace_run(self.editor.run().clone(), false)
+                    .ok();
             }
         }
         true

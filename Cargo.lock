@@ -521,15 +521,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "egui_extras"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "877bfcce06463cdbcfd7f4efd57608b1384d6d9ae03b33e503fbba1d1a899a52"
-dependencies = [
- "egui",
-]
-
-[[package]]
 name = "egui_glow"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1111,7 +1102,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "dirs",
- "egui_extras",
  "egui_glow",
  "enum-map",
  "glow",
