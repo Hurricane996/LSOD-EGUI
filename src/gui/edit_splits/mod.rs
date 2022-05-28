@@ -96,6 +96,8 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
             let mut timer = shared_state.timer.write();
             timer.replace_run(state.editor.run().clone(), false).ok();
+
+            state.dirty = false;
         }
 
         if ui.button("Discard Changes").clicked() {

@@ -35,7 +35,7 @@ enum Menu {
 impl Menu {
     fn on_destroy(&mut self, shared_state: &mut SharedState) -> bool {
         match self {
-            Menu::Main => false,
+            Menu::Main => true,
             Menu::Settings(state) => state.on_destroy(shared_state),
             Menu::EditSplits(state) => state.on_destroy(shared_state),
             Menu::EditLayout(state) => state.on_destroy(shared_state),
