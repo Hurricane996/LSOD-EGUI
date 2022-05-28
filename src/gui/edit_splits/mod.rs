@@ -76,9 +76,7 @@ fn split_editing_buttons(ui: &mut Ui, state: &mut SplitsState) {
 pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &mut SplitsState) {
     // we edit this local copy and then update the actual editor with any changes egui makes
     let mut editor_state = state.editor.state();
-
-    ui.label("This function is not finished yet. In the meantime, generate splits in the web version, then export them.");
-
+    
     meta::split_metadata(ui, state, &mut editor_state);
 
     ui.horizontal_top(|ui| {
