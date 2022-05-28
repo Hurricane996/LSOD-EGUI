@@ -76,7 +76,7 @@ fn split_editing_buttons(ui: &mut Ui, state: &mut SplitsState) {
 pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &mut SplitsState) {
     // we edit this local copy and then update the actual editor with any changes egui makes
     let mut editor_state = state.editor.state();
-    
+
     meta::split_metadata(ui, state, &mut editor_state);
 
     ui.horizontal_top(|ui| {
@@ -86,14 +86,7 @@ pub(super) fn edit_splits(ui: &mut Ui, shared_state: &mut SharedState, state: &m
 
     ui.horizontal(|ui| {
         if ui.button("Save").clicked() && state.dirty {
-            if let Some(path) = state.editor.run().path() {
-                if let Ok(file) = File::create(path) {
-                    save_run(state.editor.run(), BufWriter::new(file)).ok();
-                }
-            }
-
-            let mut timer = shared_state.timer.write();
-            timer.replace_run(state.editor.run().clone(), false).ok();
+            state.save_run(shared_state);
 
             state.dirty = false;
         }
@@ -159,7 +152,7 @@ impl SplitsState {
         self.dirty
     }
 
-    pub fn on_destroy(&mut self, shared_state: &SharedState) -> bool {
+    pub fn on_destroy(&mut self, shared_state: &mut SharedState) -> bool {
         if self.dirty {
             let should_save_splits = MessageDialog::new()
                 .set_buttons(MessageButtons::YesNo)
@@ -168,17 +161,7 @@ impl SplitsState {
                 .show();
 
             if should_save_splits {
-                if let Some(path) = self.run().path() {
-                    if let Ok(file) = File::create(path) {
-                        save_run(self.run(), BufWriter::new(file)).ok();
-                    }
-                }
-
-                shared_state
-                    .timer
-                    .write()
-                    .replace_run(self.editor.run().clone(), false)
-                    .ok();
+                self.save_run(shared_state);
             }
         }
         true
@@ -191,5 +174,20 @@ impl SplitsState {
     pub fn sync_attempts_string(&mut self) {
         self.attempts_string.clear();
         write!(self.attempts_string, "{}", self.editor.attempt_count()).ok();
+    }
+
+    fn save_run(&mut self, shared_state: &mut SharedState) {
+        if let Some(path) = self.editor.run().path() {
+            if let Ok(file) = File::create(path) {
+                save_run(self.editor.run(), BufWriter::new(file)).ok();
+            }
+        }
+
+        let mut run = self.editor.run().clone();
+
+        run.mark_as_unmodified();
+
+        let mut timer = shared_state.timer.write();
+        timer.replace_run(self.editor.run().clone(), false).ok();
     }
 }
